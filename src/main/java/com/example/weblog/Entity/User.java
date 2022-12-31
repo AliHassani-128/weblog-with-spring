@@ -1,7 +1,9 @@
-package com.example.weblog;
+package com.example.weblog.Entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document("User")
 public class User {
     @Id
     public String id;
@@ -10,7 +12,7 @@ public class User {
     public String firstName;
     public String lastName;
 
-    public User(String userName, String password, String firstName, String lastName){
+    public User(String userName, String password, String firstName, String lastName) {
         this.userName = userName;
         this.password = password;
         this.firstName = firstName;
@@ -18,7 +20,7 @@ public class User {
     }
 
     @Override
-    public String toString(){
-        return String.format("User[id=%s, userName='%s']",id, userName);
+    public String toString() {
+        return String.format("User[id=%s, userName='%s']", id, userName);
     }
 }

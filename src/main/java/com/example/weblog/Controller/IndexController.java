@@ -1,5 +1,7 @@
-package com.example.weblog;
+package com.example.weblog.Controller;
 
+import com.example.weblog.Entity.User;
+import com.example.weblog.Repository.UserRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
