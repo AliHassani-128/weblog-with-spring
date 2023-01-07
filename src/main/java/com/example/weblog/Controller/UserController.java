@@ -2,16 +2,15 @@ package com.example.weblog.Controller;
 
 
 import com.example.weblog.Models.User;
+import com.example.weblog.Payload.Response;
 import com.example.weblog.Repository.UserRepository;
 import com.example.weblog.Security.jwt.JwtUtils;
-import com.example.weblog.Security.jwt.LoginRequest;
+import com.example.weblog.Payload.LoginRequest;
 import com.example.weblog.Security.services.UserDetailsImplement;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,11 +41,11 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         if (userRepository.existsByUsername(user.getUsername())) {
-            ResponseEntity.badRequest()
-                    .body("Error: Username is already taken!");
+           return ResponseEntity.badRequest()
+                    .body(new Response("Error: Username is already taken!"));
         }
         userRepository.save(user);
-        return ResponseEntity.ok("User registered successfully!");
+        return ResponseEntity.ok(new Response("User registered successfully!"));
     }
 
 
@@ -68,7 +67,7 @@ public class UserController {
 
     }
 
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     @GetMapping("/allUsers")
     public List<User> getAllUsers(@AuthenticationPrincipal User user) {
         return userRepository.findAll();

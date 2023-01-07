@@ -1,4 +1,4 @@
-package com.example.weblog.Security.jwt;
+package com.example.weblog.Payload;
 
 
 public class LoginRequest {
