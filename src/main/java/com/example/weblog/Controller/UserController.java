@@ -1,33 +1,77 @@
 package com.example.weblog.Controller;
 
 
-import com.example.weblog.Entity.User;
+import com.example.weblog.Models.User;
 import com.example.weblog.Repository.UserRepository;
+import com.example.weblog.Security.jwt.JwtUtils;
+import com.example.weblog.Security.jwt.LoginRequest;
+import com.example.weblog.Security.services.UserDetailsImplement;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.net.URI;
-import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "*", maxAge = 3600)
+@RequestMapping("/api/auth")
 public class UserController {
-    private final AtomicLong counter = new AtomicLong();
 
     @Autowired
-    private UserRepository userRepository;
+    AuthenticationManager authenticationManager;
 
-    @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
-        User findUser = userRepository.findByUserName(user.getUserName());
-        if (findUser != null) {
-            return ResponseEntity.ok(findUser);
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    JwtUtils jwtUtils;
+
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        if (userRepository.existsByUsername(user.getUsername())) {
+            ResponseEntity.badRequest()
+                    .body("Error: Username is already taken!");
         }
-        User newUser = userRepository.save(user);
-        return ResponseEntity.ok(newUser);
+        userRepository.save(user);
+        return ResponseEntity.ok("User registered successfully!");
+    }
+
+
+    @PostMapping("/signin")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        UserDetailsImplement userDetails = (UserDetailsImplement) authentication.getPrincipal();
+
+        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+        Map<Object, Object> response = new HashMap<>();
+        response.put("username", loginRequest.getUsername());
+        response.put("token", jwtCookie);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(response);
+
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/allUsers")
+    public List<User> getAllUsers(@AuthenticationPrincipal User user) {
+        return userRepository.findAll();
     }
 
 }
