@@ -1,31 +1,43 @@
-package com.example.weblog.Entity;
+package com.example.weblog.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 
 @Document("User")
 public class User {
     @Id
-    private long id;
-    private String userName;
+    @Field("_id")
+    @JsonIgnore
+    private String id;
+    @Indexed(unique = true)
+    private String username;
     private String password;
     private String firstName;
     private String lastName;
 
-    public User(long id, String userName, String password, String firstName, String lastName) {
+    public User(String id, String username, String password, String firstName, String lastName) {
         this.id = id;
-        this.userName = userName;
+        this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    public String getUserName() {
-        return this.userName;
+    public String getId() {
+        return this.id;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public String getUsername() {
+        return this.username;
+    }
+
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getFirstName() {
@@ -55,6 +67,6 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("User[id=%s, userName='%s']", id, userName);
+        return username;
     }
 }
