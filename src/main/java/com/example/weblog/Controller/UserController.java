@@ -11,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -37,6 +39,9 @@ public class UserController {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    PasswordEncoder encoder;
+
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
@@ -44,12 +49,16 @@ public class UserController {
            return ResponseEntity.badRequest()
                     .body(new Response("Error: Username is already taken!"));
         }
-        userRepository.save(user);
+        User newUser = new User(user.getUsername(),
+                                encoder.encode(user.getPassword()),
+                                user.getFirstName(),
+                                user.getLastName());
+        userRepository.save(newUser);
         return ResponseEntity.ok(new Response("User registered successfully!"));
     }
 
 
-    @PostMapping("/signin")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -60,14 +69,13 @@ public class UserController {
 
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
         Map<Object, Object> response = new HashMap<>();
-        response.put("username", loginRequest.getUsername());
-        response.put("token", jwtCookie);
+        response.put("token", jwtCookie.getValue());
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(response);
 
     }
 
-//    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/allUsers")
     public List<User> getAllUsers(@AuthenticationPrincipal User user) {
         return userRepository.findAll();

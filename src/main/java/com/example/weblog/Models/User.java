@@ -15,12 +15,12 @@ public class User {
     private String id;
     @Indexed(unique = true)
     private String username;
+    @JsonIgnore
     private String password;
     private String firstName;
     private String lastName;
 
-    public User(String id, String username, String password, String firstName, String lastName) {
-        this.id = id;
+    public User(String username, String password, String firstName, String lastName) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
