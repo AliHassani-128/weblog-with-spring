@@ -2,6 +2,7 @@ package com.example.weblog.Controller;
 
 
 import com.example.weblog.Models.User;
+import com.example.weblog.Payload.RegisterUser;
 import com.example.weblog.Payload.Response;
 import com.example.weblog.Repository.UserRepository;
 import com.example.weblog.Security.jwt.JwtUtils;
@@ -44,15 +45,15 @@ public class UserController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        if (userRepository.existsByUsername(user.getUsername())) {
-           return ResponseEntity.badRequest()
+    public ResponseEntity<?> registerUser(@RequestBody RegisterUser registerRequest) {
+        if (userRepository.existsByUsername(registerRequest.getUsername())) {
+            return ResponseEntity.badRequest()
                     .body(new Response("Error: Username is already taken!"));
         }
-        User newUser = new User(user.getUsername(),
-                                encoder.encode(user.getPassword()),
-                                user.getFirstName(),
-                                user.getLastName());
+        User newUser = new User(registerRequest.getUsername(),
+                encoder.encode(registerRequest.getPassword()),
+                registerRequest.getFirstName(),
+                registerRequest.getLastName());
         userRepository.save(newUser);
         return ResponseEntity.ok(new Response("User registered successfully!"));
     }
