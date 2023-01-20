@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 
 @Document("User")
@@ -13,14 +15,17 @@ public class User {
     @Field("_id")
     @JsonIgnore
     private String id;
+
     @Indexed(unique = true)
+    @NotBlank
+    @Size(max = 30)
     private String username;
+    @JsonIgnore
     private String password;
     private String firstName;
     private String lastName;
 
-    public User(String id, String username, String password, String firstName, String lastName) {
-        this.id = id;
+    public User(String username, String password, String firstName, String lastName) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
