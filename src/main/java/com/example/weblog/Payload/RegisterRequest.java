@@ -1,14 +1,17 @@
 package com.example.weblog.Payload;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public class RegisterUser {
+public class RegisterRequest {
     @NotBlank
-    @Size(min = 3,max = 30)
+    @Min(3)
+    @Size(min = 3, max = 30)
     private String username;
     @NotBlank
-    @Size(min = 6 , max = 40)
+    @Size(min = 6, max = 40)
+    @Min(6)
     private String password;
     private String firstName;
     private String lastName;
@@ -37,6 +40,7 @@ public class RegisterUser {
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
+
     public String getLastName() {
         return lastName;
     }
@@ -44,7 +48,6 @@ public class RegisterUser {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-
 
 
 }

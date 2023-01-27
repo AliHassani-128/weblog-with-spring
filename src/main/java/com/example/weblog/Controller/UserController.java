@@ -2,7 +2,7 @@ package com.example.weblog.Controller;
 
 
 import com.example.weblog.Models.User;
-import com.example.weblog.Payload.RegisterUser;
+import com.example.weblog.Payload.RegisterRequest;
 import com.example.weblog.Payload.Response;
 import com.example.weblog.Repository.UserRepository;
 import com.example.weblog.Security.jwt.JwtUtils;
@@ -45,7 +45,7 @@ public class UserController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterUser registerRequest) {
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             return ResponseEntity.badRequest()
                     .body(new Response("Error: Username is already taken!"));
